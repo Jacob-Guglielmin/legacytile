@@ -193,8 +193,7 @@ function displayPuzzle(id) {
 
             mainText.innerHTML =
                 "Looks like you're using a touchscreen. Makes sense - you probably got here from a QR code.<br>Almost all of these puzzles are not designed to be played on any sort of mobile device, so you should visit this website on your computer if you want to try them.<br>Call it puzzle 0, if you like.<br><br>(If you're just on a laptop with a touchscreen, you can click the button below to ignore this and continue, but keep in mind these won't work on phones and tablets.)";
-            mainButton.innerHTML =
-                "Continue using this device (NOT RECOMMENDED)";
+            mainButton.innerHTML = "Continue (NOT RECOMMENDED)";
             mainButton.onclick = () => {
                 nextPuzzle(true);
             };
