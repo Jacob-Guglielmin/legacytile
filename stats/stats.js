@@ -24,7 +24,7 @@ function init() {
 
         if (times != null) {
             statsContainer.innerHTML += "<br>";
-            for (let puzzle = 0; puzzle < times.length; puzzle++) {
+            for (let puzzle = 1; puzzle < times.length; puzzle++) {
                 statsContainer.innerHTML += "<br>";
 
                 if (times[puzzle] != null) {
@@ -35,7 +35,7 @@ function init() {
                         convertSeconds(times[puzzle]);
                 } else {
                     statsContainer.innerHTML +=
-                        "Puzzle " + (puzzle + 1) + ": Not completed";
+                        "Puzzle " + puzzle + ": Not completed";
                 }
             }
         }
