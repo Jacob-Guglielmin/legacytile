@@ -2,8 +2,23 @@
 <html lang="en">
     <head>
         <title>Legacy Tile</title>
+        <link href="main.css" rel="stylesheet" />
+        <script src="main.js" defer></script>
     </head>
     <body>
-        <h1>Test</h1>
+        <div id="header">
+            <div id="puzzleOn"></div>
+            <div id="navBar">
+                <a href="/stats">Stats</a>
+                <a href="/">Continue</a>
+            </div>
+        </div>
+        <div id="mainText"></div>
+        <input id="mainInput" maxlength="7" />
+        <button id="mainButton"></button>
+        <div id="footer">
+            <span id="puzzleTimer"></span>
+            <span id="globalTimer"></span>
+        </div>
     </body>
 </html>
