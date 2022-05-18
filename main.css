@@ -127,7 +127,7 @@ input::selection {
 }
 
 .solutionsTable {
-    user-select: auto;
+    user-select: text;
     margin: 1vw;
     font-size: 2vh;
     border-collapse: collapse;
