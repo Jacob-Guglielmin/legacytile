@@ -110,6 +110,12 @@ input::selection {
     user-select: none;
 }
 
+#about,
+#container404 {
+    margin-top: 11vh;
+    font-size: 3vh;
+}
+
 #statsContainer {
     margin-top: 11vh;
     font-size: 2.5vh;
