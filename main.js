@@ -14,7 +14,7 @@
 
 "use strict";
 
-const overridePuzzle = "INTRO";
+const overridePuzzle = null;
 const newDevice = false;
 
 //Puzzle on
@@ -179,6 +179,8 @@ function displayPuzzle(id) {
             mainButton.onclick = nextPuzzle;
             showElements(mainButton);
             hideElements(mainInput);
+
+            document.body.style.overflowY = "scroll";
             break;
 
         case "0":
@@ -198,6 +200,8 @@ function displayPuzzle(id) {
             };
             showElements(mainButton);
             hideElements(mainInput);
+
+            document.body.style.overflowY = "scroll";
             break;
 
         case "1":
@@ -447,6 +451,8 @@ function displayPuzzle(id) {
 }
 
 function doAlways() {
+    document.body.style.overflowY = "hidden";
+
     mainButton.innerHTML = "Submit";
     mainButton.onclick = checkInput;
 
