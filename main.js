@@ -217,14 +217,15 @@ function displayPuzzle(id) {
             for (let i = 0; i < 5; i++) {
                 let curRow = solutionsTable.insertRow();
                 for (let j = 0; j < 5; j++) {
-                    curRow.insertCell().innerHTML = genRandomSequence(false);
+                    curRow.insertCell().innerHTML =
+                        genRandomSequence(false).sanitize();
                 }
             }
 
             //Set a random cell to the current solution
             solutionsTable.rows[randomBetween(0, 4)].cells[
                 randomBetween(0, 4)
-            ].innerHTML = curSolution;
+            ].innerHTML = curSolution.sanitize();
 
             mainText.appendChild(solutionsTable);
 
@@ -245,7 +246,7 @@ function displayPuzzle(id) {
 
             curSolution = genRandomSequence(true);
 
-            offscreenElement.innerHTML = curSolution;
+            offscreenElement.innerHTML = curSolution.sanitize();
 
             document.body.appendChild(offscreenElement);
 
@@ -377,7 +378,7 @@ function displayPuzzle(id) {
             //Create the element to hold each character
             let mainContainer = document.createElement("div");
             mainContainer.classList.add("contrastPuzzle");
-            mainContainer.innerHTML = curSolution;
+            mainContainer.innerHTML = curSolution.sanitize();
 
             //Position the element randomly in the bottom 80% of the screen
             mainContainer.style.left =
@@ -503,7 +504,7 @@ function updateTimePuzzle() {
         timePuzzle.charElement.innerHTML = "";
     } else {
         //We are inside the time interval - show the correct character
-        timePuzzle.charElement.innerHTML = curSolution[curHour];
+        timePuzzle.charElement.innerHTML = curSolution[curHour].sanitize();
     }
 
     //Update mainText
@@ -784,6 +785,17 @@ function renderTickers() {
         (globalSeconds < 10 ? "0" : "") +
         globalSeconds;
 }
+
+String.prototype.sanitize = function () {
+    var tagsToReplace = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;"
+    };
+    return this.replace(/[&<>]/g, function (tag) {
+        return tagsToReplace[tag] || tag;
+    });
+};
 
 //Seeded random number generator, many thanks to David Bau
 !(function (f, a, c) {
