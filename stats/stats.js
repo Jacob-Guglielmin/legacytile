@@ -1,6 +1,6 @@
 "use strict";
 
-let times, globalTime;
+let times, globalTime, secretPuzzleComplete;
 
 const statsContainer = document.getElementById("statsContainer");
 
@@ -15,10 +15,15 @@ function init() {
         globalTime = parseInt(globalTime);
     }
 
-    if (globalTime == null) {
+    secretPuzzleComplete = localStorage.getItem("secretPuzzleComplete");
+
+    if (globalTime == null && secretPuzzleComplete == null) {
         statsContainer.innerHTML =
             "There don't appear to be any stats to display yet. Try doing the puzzles first.";
-    } else {
+        return;
+    }
+
+    if (globalTime != null) {
         statsContainer.innerHTML =
             "Total time elapsed: " + convertSeconds(globalTime);
 
@@ -39,6 +44,10 @@ function init() {
                 }
             }
         }
+    }
+
+    if (secretPuzzleComplete == "true") {
+        statsContainer.innerHTML += "Puzzle ???: Completed";
     }
 }
 

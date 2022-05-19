@@ -145,13 +145,12 @@ input::selection {
     font-size: 5vh;
 }
 
-.timeChar {
+.bigCenterText {
     position: absolute;
     top: calc(50vh + (10vh / 2));
     left: 50vw;
     transform: translate(-50%, -50%);
     font-size: 20vh;
-    user-select: none;
 }
 
 .contrastPuzzle {
