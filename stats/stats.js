@@ -47,6 +47,9 @@ function init() {
     }
 
     if (secretPuzzleComplete == "true") {
+        if (globalTime != null) {
+            statsContainer.innerHTML += "<br><br>";
+        }
         statsContainer.innerHTML += "Puzzle ???: Completed";
     }
 }

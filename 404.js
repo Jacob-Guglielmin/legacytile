@@ -30,6 +30,13 @@ function init() {
 
         mainButton.onclick = checkInput;
 
+        //Register the event listener for the enter key on the input box to submit the response to the puzzle
+        mainInput.addEventListener("keypress", function (e) {
+            if (e.key == "Enter") {
+                checkInput();
+            }
+        });
+
         //Start the puzzle
         if (navigator.geolocation) {
             //We can do this puzzle
