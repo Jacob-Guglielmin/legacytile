@@ -15,12 +15,15 @@ input {
     color: #6bd603;
     font-family: "Courier New", Courier, monospace;
     box-sizing: border-box;
+    z-index: 10;
+    background-color: #2a2d31;
 }
 
 button {
     user-select: none;
     padding-left: 1.5vh;
     padding-right: 1.5vh;
+    cursor: pointer;
 }
 
 input {
@@ -157,6 +160,19 @@ input::selection {
     position: absolute;
     user-select: none;
     opacity: 0.005;
+}
+
+.breakoutInputs {
+    position: absolute;
+    top: calc(5vh - 2vh);
+}
+
+input.breakoutInputs {
+    left: calc(50vw - ((8em + 6em + 1vw) / 2));
+}
+
+button.breakoutInputs {
+    left: calc(50vw - ((8em + 6em + 1vw) / 2) + (8em + 1vw));
 }
 
 .hidden {

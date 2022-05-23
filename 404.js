@@ -16,8 +16,22 @@ let solution;
 
 let device;
 
+//Konami code
+let konami = {
+    correctSequence: "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba",
+    currentSequence: [null, null, null, null, null, null, null, null, null, null],
+    disabledKeys: []
+};
+
 function init() {
-    if (localStorage.getItem("secretPuzzleComplete") != "true") {
+    let secretPuzzles = localStorage.getItem("secretPuzzles");
+    if (secretPuzzles == null) {
+        secretPuzzles = {};
+    } else {
+        secretPuzzles = JSON.parse(secretPuzzles);
+    }
+
+    if (!secretPuzzles.geolocation) {
         //Get or generate the random seed for this user - persists across sessions
         if (localStorage.getItem("device") == null) {
             device = Math.random().toString();
@@ -40,22 +54,47 @@ function init() {
         //Start the puzzle
         if (navigator.geolocation) {
             //We can do this puzzle
-            watcher = navigator.geolocation.watchPosition(
-                checkLocationPuzzle,
-                errorHandler
-            );
+            watcher = navigator.geolocation.watchPosition(checkLocationPuzzle, errorHandler);
         }
     } else {
         //Puzzle already completed
         container404.innerHTML =
             "Well. Hmm. I think you might be lost. Try using the buttons at the top right to get where you're going.<br /><br /><br />You've already completed this puzzle. You can't do it again.";
     }
+
+    //Register the event listeners for the konami code
+    window.addEventListener("keydown", function (e) {
+        if (!konami.disabledKeys.includes(e.key)) {
+            konami.currentSequence.push(e.key);
+            konami.currentSequence.shift();
+
+            if (konami.currentSequence.join("") == konami.correctSequence) {
+                //Show the hidden puzzle
+                localStorage.setItem("doKonami", "true");
+                window.location = "/";
+            }
+
+            konami.disabledKeys.push(e.key);
+        }
+    });
+    window.addEventListener("keyup", function (e) {
+        if (konami.disabledKeys.includes(e.key)) {
+            konami.disabledKeys.splice(konami.disabledKeys.indexOf(e.key), 1);
+        }
+    });
 }
 
 function checkInput() {
     if (mainInput.value == solution) {
         //Puzzle complete
-        localStorage.setItem("secretPuzzleComplete", "true");
+        let secretPuzzles = localStorage.getItem("secretPuzzles");
+        if (secretPuzzles == null) {
+            secretPuzzles = {};
+        } else {
+            secretPuzzles = JSON.parse(secretPuzzles);
+        }
+        secretPuzzles.geolocation = true;
+        localStorage.setItem("secretPuzzles", JSON.stringify(secretPuzzles));
 
         //Delete the input box and update the message
         container404.innerHTML =
@@ -79,10 +118,8 @@ function checkLocationPuzzle(position) {
 
     //Calculate distance to school in meters
     let distToSchool =
-        Math.sqrt(
-            (schoolPos.latitude - latitude) ** 2 +
-                (schoolPos.longitude - longitude) ** 2
-        ) * 111000;
+        Math.sqrt((schoolPos.latitude - latitude) ** 2 + (schoolPos.longitude - longitude) ** 2) *
+        111000;
 
     if (distToSchool - error > 500) {
         //We aren't near the school - puzzle is complete
@@ -114,9 +151,7 @@ function genRandomSequence(seed) {
         sequence += randomBetween(0, 9, seededRandom);
     }
     for (let i = 0; i < 3; i++) {
-        sequence += "abcdefghijklmnopqrstuvwxyz"[
-            randomBetween(0, 25, seededRandom)
-        ];
+        sequence += "abcdefghijklmnopqrstuvwxyz"[randomBetween(0, 25, seededRandom)];
     }
     sequence += "!@#$%^&*(+-=[};:/>?~"[randomBetween(0, 19, seededRandom)];
 

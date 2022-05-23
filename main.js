@@ -35,6 +35,43 @@ let timePuzzle = {
     lastDate: undefined
 };
 
+//Konami code
+let konami = {
+    correctSequence: "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba",
+    currentSequence: [null, null, null, null, null, null, null, null, null, null],
+    disabledKeys: [],
+    active: false
+};
+
+let mousePos = {};
+
+//Breakout puzzle
+const breakout = {
+    chars: {
+        a: "12346789acdf",
+        c: "12347adef",
+        e: "1234789adef",
+        f: "1234789ad",
+        h: "1346789acdf",
+        j: "369acdef",
+        l: "147adef",
+        p: "12346789ad",
+        t: "12358be",
+        u: "134679acdef",
+        2: "1236789adef",
+        3: "1236789cdef",
+        4: "1346789cf",
+        6: "1234789acdef",
+        7: "12369cf",
+        9: "12346789cdef",
+        "!": "258e",
+        ".": "e",
+        "]": "2369cef",
+        ":": "5b",
+        "-": "789"
+    }
+};
+
 //Audio stuff
 let audio = {};
 
@@ -45,7 +82,8 @@ const mainText = document.getElementById("mainText"),
     mainButton = document.getElementById("mainButton"),
     puzzleOnElement = document.getElementById("puzzleOn"),
     puzzleTicker = document.getElementById("puzzleTimer"),
-    globalTicker = document.getElementById("globalTimer");
+    globalTicker = document.getElementById("globalTimer"),
+    footer = document.getElementById("footer");
 
 function init() {
     //Get or generate the random seed for this user - persists across sessions
@@ -89,13 +127,19 @@ function init() {
         //Display the introduction
         displayPuzzle("INTRO");
     } else {
-        //Check if the user is using a mobile device
-        if (navigator.maxTouchPoints != 0) {
-            //Display the warning
-            displayPuzzle("0");
+        if (localStorage.getItem("doKonami") == "true") {
+            localStorage.removeItem("doKonami");
+            konami.active = true;
+            displayPuzzle("???");
         } else {
-            //Display the current puzzle
-            displayPuzzle(puzzle);
+            //Check if the user is using a mobile device
+            if (navigator.maxTouchPoints != 0) {
+                //Display the warning
+                displayPuzzle("0");
+            } else {
+                //Display the current puzzle
+                displayPuzzle(puzzle);
+            }
         }
     }
 
@@ -104,6 +148,35 @@ function init() {
         if (e.key == "Enter") {
             checkInput();
         }
+    });
+
+    //Register the event listeners for the konami code
+    window.addEventListener("keydown", function (e) {
+        if (!konami.disabledKeys.includes(e.key)) {
+            konami.currentSequence.push(e.key);
+            konami.currentSequence.shift();
+
+            if (konami.currentSequence.join("") == konami.correctSequence) {
+                //Show the hidden puzzle
+                if (!konami.active) {
+                    konami.active = true;
+                    displayPuzzle("???");
+                }
+            }
+
+            konami.disabledKeys.push(e.key);
+        }
+    });
+    window.addEventListener("keyup", function (e) {
+        if (konami.disabledKeys.includes(e.key)) {
+            konami.disabledKeys.splice(konami.disabledKeys.indexOf(e.key), 1);
+        }
+    });
+
+    //Track the mouse
+    window.addEventListener("mousemove", function (e) {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
     });
 }
 
@@ -151,14 +224,32 @@ function nextPuzzle(cameFromTouchCheck) {
 
 function checkInput() {
     if (curSolution == mainInput.value) {
-        //Display the next puzzle
-        nextPuzzle();
+        if (!konami.active) {
+            //Display the next puzzle
+            nextPuzzle();
+        } else {
+            //We have completed the breakout puzzle
+            konami.active = false;
+            cleanUpBreakout();
+
+            //Save this puzzle as being completed
+            let secretPuzzles = localStorage.getItem("secretPuzzles");
+            if (secretPuzzles == null) {
+                secretPuzzles = {};
+            } else {
+                secretPuzzles = JSON.parse(secretPuzzles);
+            }
+            secretPuzzles.breakout = true;
+            localStorage.setItem("secretPuzzles", JSON.stringify(secretPuzzles));
+
+            displayPuzzle(puzzle);
+        }
     } else {
         //Shake the input box
         shake(mainInput);
 
         //If we got the answer wrong on puzzle 1, redisplay the puzzle to prevent brute-forcing it without understanding how the puzzles work
-        if (puzzle == "1") {
+        if (puzzle == "1" && !konami.active) {
             displayPuzzle("1");
         }
     }
@@ -177,7 +268,7 @@ function displayPuzzle(id) {
                 "Hi there! You must've just scanned the QR code on my legacy tile! I made a series of (hopefully fun) puzzles that you can try out. Just a quick warning in advance - these puzzles do get quite difficult (I mean, this is Westmount, after all). Each of the puzzles is very different than each of the others, but many will require you to use some form of external tools of your choosing. If you do decide to try these out, I hope you enjoy them! For those of you who are already thinking about it, just letting you know that viewing the page source will spoil many of the puzzles.";
             mainButton.innerHTML = "Got it!";
             mainButton.onclick = nextPuzzle;
-            showElements(mainButton);
+            showElements(mainButton, mainText);
             hideElements(mainInput);
 
             document.body.style.overflowY = "scroll";
@@ -197,7 +288,7 @@ function displayPuzzle(id) {
             mainButton.onclick = () => {
                 nextPuzzle(true);
             };
-            showElements(mainButton);
+            showElements(mainButton, mainText);
             hideElements(mainInput);
 
             document.body.style.overflowY = "scroll";
@@ -217,15 +308,13 @@ function displayPuzzle(id) {
             for (let i = 0; i < 5; i++) {
                 let curRow = solutionsTable.insertRow();
                 for (let j = 0; j < 5; j++) {
-                    curRow.insertCell().innerHTML =
-                        genRandomSequence(false).sanitize();
+                    curRow.insertCell().innerHTML = genRandomSequence(false).sanitize();
                 }
             }
 
             //Set a random cell to the current solution
-            solutionsTable.rows[randomBetween(0, 4)].cells[
-                randomBetween(0, 4)
-            ].innerHTML = curSolution.sanitize();
+            solutionsTable.rows[randomBetween(0, 4)].cells[randomBetween(0, 4)].innerHTML =
+                curSolution.sanitize();
 
             mainText.appendChild(solutionsTable);
 
@@ -308,23 +397,17 @@ function displayPuzzle(id) {
             };
             let notesSelected = [];
             notesSelected.push(
-                Object.keys(sharps)[
-                    randomBetween(0, Object.keys(sharps).length - 1)
-                ] + randomBetween(4, 5)
+                Object.keys(sharps)[randomBetween(0, Object.keys(sharps).length - 1)] +
+                    randomBetween(4, 5)
             );
             notesSelected.push(
-                Object.keys(notes)[
-                    randomBetween(0, Object.keys(notes).length - 1)
-                ] + randomBetween(4, 5)
+                Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] +
+                    randomBetween(4, 5)
             );
-            while (
-                notesSelected.length < 3 ||
-                notesSelected[1] == notesSelected[2]
-            ) {
+            while (notesSelected.length < 3 || notesSelected[1] == notesSelected[2]) {
                 notesSelected.push(
-                    Object.keys(notes)[
-                        randomBetween(0, Object.keys(notes).length - 1)
-                    ] + randomBetween(4, 5)
+                    Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] +
+                        randomBetween(4, 5)
                 );
             }
             shuffleArray(notesSelected);
@@ -381,13 +464,9 @@ function displayPuzzle(id) {
             mainContainer.innerHTML = curSolution.sanitize();
 
             //Position the element randomly in the bottom 80% of the screen
-            mainContainer.style.left =
-                randomBetween(100, window.innerWidth - 100) + "px";
+            mainContainer.style.left = randomBetween(100, window.innerWidth - 100) + "px";
             mainContainer.style.top =
-                randomBetween(
-                    0.2 * window.innerHeight,
-                    window.innerHeight - 100
-                ) + "px";
+                randomBetween(0.2 * window.innerHeight, window.innerHeight - 100) + "px";
 
             //Add the container to the page
             document.body.appendChild(mainContainer);
@@ -442,6 +521,31 @@ function displayPuzzle(id) {
             doAlways();
             break;
 
+        case "???":
+            //BREAKOUT
+
+            let secretPuzzles = localStorage.getItem("secretPuzzles");
+            if (secretPuzzles == null) {
+                secretPuzzles = {};
+            } else {
+                secretPuzzles = JSON.parse(secretPuzzles);
+            }
+
+            if (!secretPuzzles.breakout) {
+                //Generate a solution using only characters that can be displayed on the breakout grid
+                curSolution = genRandomSequence(true, undefined, true);
+
+                //This puzzle is really complicated from a code perspective - doing it in this switch case would be insane, so just call the setup function
+                setupBreakout();
+
+                //This gets passed true in order to hide the text and footer
+                doAlways(true);
+            } else {
+                mainText.innerHTML = "You've already completed this puzzle. You can't do it again.";
+                hideElements(mainButton, mainInput);
+            }
+            break;
+
         default:
             mainText.innerHTML =
                 "Well, whatever you've just tried to do, it didn't work. It could be something on my end (sorry!). Try reloading the page.";
@@ -450,22 +554,389 @@ function displayPuzzle(id) {
     }
 }
 
-function doAlways() {
+function doAlways(breakout) {
     document.body.style.overflowY = "hidden";
 
     mainButton.innerHTML = "Submit";
     mainButton.onclick = checkInput;
 
-    showElements(mainInput, mainButton);
+    if (!breakout) {
+        showElements(mainInput, mainButton, mainText);
+    } else {
+        showElements(mainInput, mainButton);
+        hideElements(mainText);
+    }
 
     if (puzzle != "3" && timePuzzle.updateHandler != undefined) {
         clearInterval(timePuzzle.updateHandler);
     }
 
-    renderTickers();
-    if (timeTrackingInterval == null) {
-        timeTrackingInterval = setInterval(trackTime, 1000);
+    if (!breakout) {
+        showElements(footer);
+        renderTickers();
+        if (timeTrackingInterval == null) {
+            timeTrackingInterval = setInterval(trackTime, 1000);
+        }
+    } else {
+        hideElements(footer);
+        if (timeTrackingInterval != null) {
+            clearInterval(timeTrackingInterval);
+            timeTrackingInterval = null;
+        }
     }
+}
+
+function setupBreakout() {
+    //Make the canvas
+    breakout.canvas = document.createElement("canvas");
+    breakout.renderer = breakout.canvas.getContext("2d");
+    breakout.canvas.style.position = "absolute";
+    breakout.canvas.style.bottom = "0";
+    breakout.canvas.style.left = "0";
+
+    //Initialize the grid to full of breakable bricks
+    breakout.grid = [];
+    for (let i = 0; i < 13; i++) {
+        breakout.grid[i] = [];
+        for (let j = 0; j < 33; j++) {
+            breakout.grid[i][j] = 1;
+        }
+    }
+
+    //Make the bricks representing the code unbreakable
+    for (let char = 0; char < curSolution.length; char++) {
+        let leftSide = char * 5;
+        let topSide = (13 - 5) / 2;
+
+        let positions = breakout.chars[curSolution[char]];
+
+        for (let i = 0; i < positions.length; i++) {
+            let position = parseInt(positions[i], 16) - 1;
+
+            let x = leftSide + (position % 3);
+            let y = topSide + Math.floor(position / 3);
+
+            breakout.grid[y][x] = 2;
+        }
+    }
+
+    //Create the ball object
+    breakout.ball = {
+        velocity: 0.3,
+        direction: randomBetween(-10, 10) * (Math.PI / 40) - Math.PI / 2
+    };
+
+    //Add the canvas to the screen
+    document.body.appendChild(breakout.canvas);
+
+    mainInput.classList.add("breakoutInputs");
+    mainButton.classList.add("breakoutInputs");
+
+    //Resize the canvas to fit the screen (calls the rendering so this has to be done last)
+    resizeBreakout();
+}
+
+function cleanUpBreakout() {
+    //Stop the rendering loop
+    cancelAnimationFrame(breakout.animationFrame);
+
+    //Remove the canvas from the screen
+    breakout.canvas.remove();
+
+    //Make the input elements behave normally again
+    mainInput.classList.remove("breakoutInputs");
+    mainButton.classList.remove("breakoutInputs");
+
+    //Clear out the breakout object
+    delete breakout.grid;
+    delete breakout.ball;
+    delete breakout.renderer;
+    delete breakout.canvas;
+    delete breakout.animationFrame;
+
+    //Remove focus from the input and button
+    mainInput.blur();
+    mainButton.blur();
+}
+
+function updateBreakout(timestamp) {
+    let deltaT;
+    if (timestamp == undefined) {
+        deltaT = 0;
+    } else {
+        if (breakout.prevTime == undefined) {
+            breakout.prevTime = timestamp;
+            deltaT = 0;
+        } else {
+            deltaT = timestamp - breakout.prevTime;
+            breakout.prevTime = timestamp;
+        }
+    }
+
+    //Move paddle
+    if (mousePos.x != undefined) {
+        breakout.paddle.x = clamp(
+            mousePos.x - breakout.paddle.width / 2,
+            0,
+            window.innerWidth - breakout.paddle.width
+        );
+    }
+
+    //Save previous position of ball
+    let prevBallPos = {
+        x: breakout.ball.x,
+        y: breakout.ball.y
+    };
+
+    //Update the ball's position
+    breakout.ball.x += Math.cos(breakout.ball.direction) * breakout.ball.velocity * deltaT;
+    breakout.ball.y += Math.sin(breakout.ball.direction) * breakout.ball.velocity * deltaT;
+
+    //Check if the ball is touching the edge of the screen
+    if (breakout.ball.x < breakout.ballSize) {
+        breakout.ball.x = breakout.ballSize;
+        breakout.ball.direction = Math.PI - breakout.ball.direction;
+    }
+    if (breakout.ball.x > breakout.canvas.width - breakout.ballSize) {
+        breakout.ball.x = breakout.canvas.width - breakout.ballSize;
+        breakout.ball.direction = Math.PI - breakout.ball.direction;
+    }
+    if (breakout.ball.y < breakout.ballSize) {
+        breakout.ball.y = breakout.ballSize;
+        breakout.ball.direction = -breakout.ball.direction;
+    }
+    if (breakout.ball.y > breakout.canvas.height - breakout.ballSize) {
+        //The ball has hit the bottom of the screen - spawn a new ball
+        breakout.ball.x = breakout.canvas.width / 2;
+        breakout.ball.y = breakout.canvas.height * 0.85;
+        breakout.ball.direction = randomBetween(-10, 10) * (Math.PI / 40) - Math.PI / 2;
+    }
+
+    //Check if the ball has hit the paddle
+    if (
+        breakout.ball.x > breakout.paddle.x - breakout.ballSize &&
+        breakout.ball.x < breakout.paddle.x + breakout.paddle.width + breakout.ballSize &&
+        breakout.ball.y > breakout.paddle.y - breakout.ballSize &&
+        prevBallPos.y < breakout.paddle.y - breakout.ballSize
+    ) {
+        //Calculate direction of ball - edge should aim ball Math.PI / 4 away from the center, center should aim up
+
+        let hitPos =
+            (breakout.ball.x - breakout.paddle.x - breakout.paddle.width / 2) /
+            (breakout.paddle.width / 2);
+
+        if (Math.abs(hitPos) < 0.2) {
+            breakout.ball.direction = -breakout.ball.direction;
+        } else {
+            breakout.ball.direction = -(Math.PI / 2) + (hitPos * Math.PI) / 4;
+        }
+
+        breakout.ball.y = breakout.paddle.y - breakout.ballSize;
+    }
+
+    //Check if the ball has hit a brick
+    for (let i = 0; i < breakout.grid.length; i++) {
+        for (let j = 0; j < breakout.grid[i].length; j++) {
+            if (breakout.grid[i][j] != 0) {
+                if (
+                    checkCollision(
+                        breakout.ball.x,
+                        breakout.ball.y,
+                        (j + 1) * breakout.brickWidth,
+                        (i + 2) * breakout.brickHeight
+                    )
+                ) {
+                    //The ball has hit this brick
+
+                    //Figure out if it hit the side or the top
+
+                    //Check if it was above or below the brick
+                    let line;
+                    if (prevBallPos.y > (i + 2.5) * breakout.brickHeight) {
+                        //Below
+                        line = {
+                            x1: (j + 1) * breakout.brickWidth,
+                            y1: (i + 3) * breakout.brickHeight,
+                            x2: (j + 2) * breakout.brickWidth,
+                            y2: (i + 3) * breakout.brickHeight
+                        };
+                    } else {
+                        //Above
+                        line = {
+                            x1: (j + 1) * breakout.brickWidth,
+                            y1: (i + 2) * breakout.brickHeight,
+                            x2: (j + 2) * breakout.brickWidth,
+                            y2: (i + 2) * breakout.brickHeight
+                        };
+                    }
+
+                    //Check if the path of the ball intersects this line
+                    if (
+                        checkLines(
+                            line.x1,
+                            line.y1,
+                            line.x2,
+                            line.y2,
+                            prevBallPos.x,
+                            prevBallPos.y,
+                            breakout.ball.x + Math.cos(breakout.ball.direction) * 1000,
+                            breakout.ball.y + Math.sin(breakout.ball.direction) * 1000
+                        )
+                    ) {
+                        //The ball hit the top or bottom of the brick
+                        breakout.ball.direction = -breakout.ball.direction;
+
+                        //Snap to the side that was hit
+                        if (prevBallPos.y > (i + 2.5) * breakout.brickHeight) {
+                            //Bottom
+                            breakout.ball.y =
+                                (i + 3) * breakout.brickHeight * 1.001 + breakout.ballSize;
+                        } else {
+                            //Top
+                            breakout.ball.y =
+                                (i + 2) * breakout.brickHeight * 0.999 - breakout.ballSize;
+                        }
+                    } else {
+                        //The ball hit the side of the brick
+                        breakout.ball.direction = Math.PI - breakout.ball.direction;
+
+                        //Snap to the side that was hit
+                        if (prevBallPos.x > (j + 1.5) * breakout.brickWidth) {
+                            //Right
+                            breakout.ball.x =
+                                (j + 2) * breakout.brickWidth * 1.001 + breakout.ballSize;
+                        } else {
+                            //Left
+                            breakout.ball.x =
+                                (j + 1) * breakout.brickWidth * 0.999 - breakout.ballSize;
+                        }
+                    }
+
+                    if (breakout.grid[i][j] == 1) {
+                        //Remove the brick
+                        breakout.grid[i][j] = 0;
+                    } else if (breakout.grid[i][j] == 2) {
+                        //Color the brick
+                        breakout.grid[i][j] = 3;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function checkCollision(ballx, bally, brickx, bricky) {
+    let closeX = clamp(ballx, brickx, brickx + breakout.brickWidth);
+    let closeY = clamp(bally, bricky, bricky + breakout.brickHeight);
+
+    let distance = Math.sqrt(Math.pow(closeX - ballx, 2) + Math.pow(closeY - bally, 2));
+
+    return distance < breakout.ballSize;
+}
+
+function checkLines(x1, y1, x2, y2, x3, y3, x4, y4) {
+    let uA =
+        ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) /
+        ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+
+    let uB =
+        ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) /
+        ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+
+    if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+        return true;
+    }
+
+    return false;
+}
+
+function resizeBreakout() {
+    breakout.canvas.width = window.innerWidth;
+    breakout.canvas.height = window.innerHeight - (window.innerHeight * 0.1 + 2);
+
+    //Make the paddle be in the middle of the screen
+    breakout.paddle = {};
+    breakout.paddle.width = breakout.canvas.width * 0.15;
+    breakout.paddle.height = breakout.canvas.height * 0.02;
+    breakout.paddle.x = breakout.canvas.width / 2 - breakout.paddle.width / 2;
+    breakout.paddle.y = breakout.canvas.height * 0.9;
+
+    //Make the ball be in the middle of the paddle
+    breakout.ball.x = breakout.canvas.width / 2;
+    breakout.ball.y = breakout.canvas.height * 0.85;
+    breakout.ballSize = breakout.canvas.width * 0.0075;
+
+    //Calculate brick size
+    breakout.brickWidth = breakout.canvas.width / (breakout.grid[0].length + 2);
+    breakout.brickHeight = (breakout.canvas.height * 0.6) / (breakout.grid.length + 2);
+
+    //Render the game (resizing a canvas clears it too)
+    breakout.animationFrame = renderBreakout();
+}
+
+function renderBreakout(timestamp) {
+    //Progress one frame
+    updateBreakout(timestamp);
+
+    //Clear the canvas
+    clearBreakoutCanvas();
+
+    //Draw all full bricks
+    for (let i = 0; i < breakout.grid.length; i++) {
+        for (let j = 0; j < breakout.grid[i].length; j++) {
+            if (breakout.grid[i][j] != 0) {
+                drawBrick(j, i, breakout.grid[i][j]);
+            }
+        }
+    }
+
+    //Draw the paddle
+    drawPaddle();
+
+    //Draw the ball
+    drawBall();
+
+    breakout.animationFrame = requestAnimationFrame(renderBreakout);
+}
+
+function drawBrick(x, y, type) {
+    breakout.renderer.fillStyle = type != 3 ? "#6bd603" : "#d63803";
+    breakout.renderer.strokeStyle = "#2a2d31";
+    breakout.renderer.fillRect(
+        (x + 1) * breakout.brickWidth,
+        (y + 2) * breakout.brickHeight,
+        breakout.brickWidth,
+        breakout.brickHeight
+    );
+    breakout.renderer.strokeRect(
+        (x + 1) * breakout.brickWidth,
+        (y + 2) * breakout.brickHeight,
+        breakout.brickWidth,
+        breakout.brickHeight
+    );
+}
+
+function drawPaddle() {
+    breakout.renderer.fillStyle = "#d3d7cd";
+
+    breakout.renderer.fillRect(
+        breakout.paddle.x,
+        breakout.paddle.y,
+        breakout.paddle.width,
+        breakout.paddle.height
+    );
+}
+
+function drawBall() {
+    breakout.renderer.fillStyle = "#d3d7cd";
+    breakout.renderer.beginPath();
+    breakout.renderer.arc(breakout.ball.x, breakout.ball.y, breakout.ballSize, 0, 2 * Math.PI);
+    breakout.renderer.fill();
+}
+
+function clearBreakoutCanvas() {
+    breakout.renderer.clearRect(0, 0, breakout.canvas.width, breakout.canvas.height);
 }
 
 function updateTimePuzzle() {
@@ -475,10 +946,7 @@ function updateTimePuzzle() {
     let curDate = dateObj.toISOString().split("T")[0];
     if (curDate != timePuzzle.lastDate && timePuzzle.lastDate != undefined) {
         //Reset the solution
-        curSolution = genRandomSequence(
-            true,
-            new Date().toLocaleString().split(",")[0] + device
-        );
+        curSolution = genRandomSequence(true, new Date().toLocaleString().split(",")[0] + device);
 
         timePuzzle.lastDate = curDate;
     } else if (timePuzzle.lastDate == undefined) {
@@ -537,7 +1005,7 @@ function updateTimePuzzle() {
     }
 }
 
-function genRandomSequence(isValid, seed) {
+function genRandomSequence(isValid, seed, useBreakoutChars) {
     let seededRandom;
     if (seed != undefined) {
         seededRandom = new Math.seedrandom(seed);
@@ -561,15 +1029,25 @@ function genRandomSequence(isValid, seed) {
     }
     let sequence = "";
     for (let i = 0; i < numberCount; i++) {
-        sequence += randomBetween(0, 9, seededRandom);
+        if (!useBreakoutChars) {
+            sequence += randomBetween(0, 9, seededRandom);
+        } else {
+            sequence += "234679"[randomBetween(0, 5, seededRandom)];
+        }
     }
     for (let i = 0; i < letterCount; i++) {
-        sequence += "abcdefghijklmnopqrstuvwxyz"[
-            randomBetween(0, 25, seededRandom)
-        ];
+        if (!useBreakoutChars) {
+            sequence += "abcdefghijklmnopqrstuvwxyz"[randomBetween(0, 25, seededRandom)];
+        } else {
+            sequence += "acefhjlptu"[randomBetween(0, 9, seededRandom)];
+        }
     }
     for (let i = 0; i < symbolCount; i++) {
-        sequence += "!@#$%^&*(+-=[};:/>?~"[randomBetween(0, 19, seededRandom)];
+        if (!useBreakoutChars) {
+            sequence += "!@#$%^&*(+-=[};:/>?~"[randomBetween(0, 19, seededRandom)];
+        } else {
+            sequence += ".:-!]"[randomBetween(0, 4, seededRandom)];
+        }
     }
 
     //Shuffle the sequence
@@ -638,25 +1116,19 @@ function playTones(...tones) {
         //Create a wave with the given pitch and volume for the given time
         for (i = 0; i < audio.context.sampleRate * tone.time; i++) {
             soundArr.push(
-                Math.sin(
-                    i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))
-                ) * tone.volume
+                Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume
             );
         }
 
         //The rest here is to prevent weird audio artifacts created by each tone dropping to zero and then back to volume
         //Keep generating the wave until the value reaches about 0
         let prev =
-            Math.sin(
-                (i - 1) /
-                    (audio.context.sampleRate / tone.pitch / (Math.PI * 2))
-            ) * tone.volume;
+            Math.sin((i - 1) / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) *
+            tone.volume;
         while (true) {
             //Get the next value
             let next =
-                Math.sin(
-                    i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))
-                ) * tone.volume;
+                Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume;
 
             //Check if the new value has just crossed into the positive range
             if (prev <= 0 && next >= 0) {
@@ -684,11 +1156,7 @@ function playTones(...tones) {
     for (let i = 0; i < soundArr.length; i++) {
         buf[i] = soundArr[i];
     }
-    let buffer = audio.context.createBuffer(
-        1,
-        buf.length,
-        audio.context.sampleRate
-    );
+    let buffer = audio.context.createBuffer(1, buf.length, audio.context.sampleRate);
     buffer.copyToChannel(buf, 0);
 
     //Cancel playing sounds
@@ -719,10 +1187,7 @@ function shuffleArray(array) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
 
-        [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex],
-            array[currentIndex]
-        ];
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
 
     return array;
@@ -745,16 +1210,19 @@ window.addEventListener("focus", () => {
         puzzle != undefined &&
         puzzle != "INTRO" &&
         puzzle != "0" &&
+        puzzle != "???" &&
         timeTrackingInterval == null
     ) {
         timeTrackingInterval = setInterval(trackTime, 1000);
     }
 });
 function trackTime() {
-    puzzleTimeElapsed++;
-    globalTimeElapsed++;
+    if (!konami.active) {
+        puzzleTimeElapsed++;
+        globalTimeElapsed++;
 
-    renderTickers();
+        renderTickers();
+    }
 }
 function renderTickers() {
     let puzzleHours = Math.floor(puzzleTimeElapsed / 3600);
@@ -796,6 +1264,8 @@ String.prototype.sanitize = function () {
         return tagsToReplace[tag] || tag;
     });
 };
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 //Seeded random number generator, many thanks to David Bau
 // prettier-ignore

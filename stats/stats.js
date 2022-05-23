@@ -1,8 +1,15 @@
 "use strict";
 
-let times, globalTime, secretPuzzleComplete;
+let times, globalTime, secretPuzzles;
 
 const statsContainer = document.getElementById("statsContainer");
+
+//Konami code
+let konami = {
+    correctSequence: "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba",
+    currentSequence: [null, null, null, null, null, null, null, null, null, null],
+    disabledKeys: []
+};
 
 function init() {
     times = localStorage.getItem("puzzleTimes");
@@ -15,43 +22,64 @@ function init() {
         globalTime = parseInt(globalTime);
     }
 
-    secretPuzzleComplete = localStorage.getItem("secretPuzzleComplete");
+    secretPuzzles = localStorage.getItem("secretPuzzles");
 
-    if (globalTime == null && secretPuzzleComplete == null) {
+    if (globalTime == null && secretPuzzles == null) {
         statsContainer.innerHTML =
             "There don't appear to be any stats to display yet. Try doing the puzzles first.";
         return;
     }
 
     if (globalTime != null) {
-        statsContainer.innerHTML =
-            "Total time elapsed: " + convertSeconds(globalTime);
+        statsContainer.innerHTML = "Total time elapsed: " + convertSeconds(globalTime);
 
-        if (times != null) {
+        if (times != null && times.length > 0) {
             statsContainer.innerHTML += "<br>";
             for (let puzzle = 1; puzzle < times.length; puzzle++) {
                 statsContainer.innerHTML += "<br>";
 
                 if (times[puzzle] != null) {
                     statsContainer.innerHTML +=
-                        "Puzzle " +
-                        puzzle +
-                        ": " +
-                        convertSeconds(times[puzzle]);
+                        "Puzzle " + puzzle + ": " + convertSeconds(times[puzzle]);
                 } else {
-                    statsContainer.innerHTML +=
-                        "Puzzle " + puzzle + ": Not completed";
+                    statsContainer.innerHTML += "Puzzle " + puzzle + ": Not completed";
                 }
             }
         }
     }
 
-    if (secretPuzzleComplete == "true") {
+    if (secretPuzzles != null) {
         if (globalTime != null) {
             statsContainer.innerHTML += "<br><br>";
         }
-        statsContainer.innerHTML += "Puzzle ???: Completed";
+        let secretPuzzlesCompleted = Object.keys(JSON.parse(secretPuzzles)).length;
+        statsContainer.innerHTML +=
+            "Completed " +
+            secretPuzzlesCompleted +
+            " secret puzzle" +
+            (secretPuzzlesCompleted > 1 ? "s" : "");
     }
+
+    //Register the event listeners for the konami code
+    window.addEventListener("keydown", function (e) {
+        if (!konami.disabledKeys.includes(e.key)) {
+            konami.currentSequence.push(e.key);
+            konami.currentSequence.shift();
+
+            if (konami.currentSequence.join("") == konami.correctSequence) {
+                //Show the hidden puzzle
+                localStorage.setItem("doKonami", "true");
+                window.location = "/";
+            }
+
+            konami.disabledKeys.push(e.key);
+        }
+    });
+    window.addEventListener("keyup", function (e) {
+        if (konami.disabledKeys.includes(e.key)) {
+            konami.disabledKeys.splice(konami.disabledKeys.indexOf(e.key), 1);
+        }
+    });
 }
 
 //Convert seconds to hh:mm:ss
