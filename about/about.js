@@ -2,20 +2,8 @@
 
 //Konami code
 let konami = {
-    correctSequence:
-        "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba",
-    currentSequence: [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-    ],
+    correctSequence: "ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba",
+    currentSequence: [null, null, null, null, null, null, null, null, null, null],
     disabledKeys: []
 };
 
