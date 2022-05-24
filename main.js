@@ -532,15 +532,20 @@ function displayPuzzle(id) {
             }
 
             if (!secretPuzzles.breakout) {
+                //Cancel running puzzles
+                if (timePuzzle.updateHandler != undefined) {
+                    clearInterval(timePuzzle.updateHandler);
+                }
+                if (removeOnNextPuzzle != undefined) {
+                    removeOnNextPuzzle.remove();
+                    removeOnNextPuzzle = undefined;
+                }
+
                 //Generate a solution using only characters that can be displayed on the breakout grid
                 curSolution = genRandomSequence(true, undefined, true);
 
                 //This puzzle is really complicated from a code perspective - doing it in this switch case would be insane, so just call the setup function
                 setupBreakout();
-
-                if (timePuzzle.updateHandler != undefined) {
-                    clearInterval(timePuzzle.updateHandler);
-                }
 
                 //This gets passed true in order to hide the text and footer
                 doAlways(true);
