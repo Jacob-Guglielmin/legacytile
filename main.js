@@ -553,6 +553,7 @@ function displayPuzzle(id) {
             } else {
                 mainText.innerHTML = "You've already completed this puzzle. You can't do it again.";
                 showElements(mainText);
+                hideElements(mainInput, mainButton);
             }
             break;
 
