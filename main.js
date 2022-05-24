@@ -86,7 +86,6 @@ const mainText = document.getElementById("mainText"),
     footer = document.getElementById("footer");
 
 function init() {
-    navigator.clipboard.readText().then((x) => console.log(x));
     //Get or generate the random seed for this user - persists across sessions
     if (localStorage.getItem("device") == null || newDevice) {
         device = Math.random().toString();
