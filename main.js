@@ -535,6 +535,7 @@ function displayPuzzle(id) {
                 //Cancel running puzzles
                 if (timePuzzle.updateHandler != undefined) {
                     clearInterval(timePuzzle.updateHandler);
+                    timePuzzle.updateHandler = undefined;
                 }
                 if (removeOnNextPuzzle != undefined) {
                     removeOnNextPuzzle.remove();
