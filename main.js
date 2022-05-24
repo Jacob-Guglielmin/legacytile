@@ -547,13 +547,13 @@ function displayPuzzle(id) {
 
                 //This puzzle is really complicated from a code perspective - doing it in this switch case would be insane, so just call the setup function
                 setupBreakout();
-
-                //This gets passed true in order to hide the text and footer
-                doAlways(true);
             } else {
                 mainText.innerHTML = "You've already completed this puzzle. You can't do it again.";
                 hideElements(mainButton, mainInput);
             }
+
+            //This gets passed true in order to hide the text and footer
+            doAlways(true);
             break;
 
         default:
