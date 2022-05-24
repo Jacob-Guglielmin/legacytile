@@ -541,6 +541,9 @@ function displayPuzzle(id) {
                 removeOnNextPuzzle = undefined;
             }
 
+            //This gets passed true in order to hide the text and footer
+            doAlways(true);
+
             if (!secretPuzzles.breakout) {
                 //Generate a solution using only characters that can be displayed on the breakout grid
                 curSolution = genRandomSequence(true, undefined, true);
@@ -549,11 +552,8 @@ function displayPuzzle(id) {
                 setupBreakout();
             } else {
                 mainText.innerHTML = "You've already completed this puzzle. You can't do it again.";
-                hideElements(mainButton, mainInput);
+                showElements(mainText);
             }
-
-            //This gets passed true in order to hide the text and footer
-            doAlways(true);
             break;
 
         default:
