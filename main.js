@@ -14,7 +14,7 @@
 
 "use strict";
 
-const overridePuzzle = null;
+const overridePuzzle = "6";
 const newDevice = false;
 
 //Puzzle on
@@ -531,17 +531,17 @@ function displayPuzzle(id) {
                 secretPuzzles = JSON.parse(secretPuzzles);
             }
 
-            if (!secretPuzzles.breakout) {
-                //Cancel running puzzles
-                if (timePuzzle.updateHandler != undefined) {
-                    clearInterval(timePuzzle.updateHandler);
-                    timePuzzle.updateHandler = undefined;
-                }
-                if (removeOnNextPuzzle != undefined) {
-                    removeOnNextPuzzle.remove();
-                    removeOnNextPuzzle = undefined;
-                }
+            //Cancel running puzzles
+            if (timePuzzle.updateHandler != undefined) {
+                clearInterval(timePuzzle.updateHandler);
+                timePuzzle.updateHandler = undefined;
+            }
+            if (removeOnNextPuzzle != undefined) {
+                removeOnNextPuzzle.remove();
+                removeOnNextPuzzle = undefined;
+            }
 
+            if (!secretPuzzles.breakout) {
                 //Generate a solution using only characters that can be displayed on the breakout grid
                 curSolution = genRandomSequence(true, undefined, true);
 
