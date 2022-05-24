@@ -14,7 +14,7 @@
 
 "use strict";
 
-const overridePuzzle = "6";
+const overridePuzzle = null;
 const newDevice = false;
 
 //Puzzle on
