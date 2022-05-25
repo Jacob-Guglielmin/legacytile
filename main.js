@@ -633,7 +633,7 @@ function setupBreakout() {
 
     //Create the ball object
     breakout.ball = {
-        velocity: 0.3,
+        velocity: 1,
         direction: randomBetween(-10, 10) * (Math.PI / 40) - Math.PI / 2
     };
 
@@ -670,20 +670,7 @@ function cleanUpBreakout() {
     mainButton.blur();
 }
 
-function updateBreakout(timestamp) {
-    let deltaT;
-    if (timestamp == undefined) {
-        deltaT = 0;
-    } else {
-        if (breakout.prevTime == undefined) {
-            breakout.prevTime = timestamp;
-            deltaT = 0;
-        } else {
-            deltaT = timestamp - breakout.prevTime;
-            breakout.prevTime = timestamp;
-        }
-    }
-
+function updateBreakout(deltaT) {
     //Move paddle
     if (mousePos.x != undefined) {
         breakout.paddle.x = clamp(
@@ -883,12 +870,27 @@ function resizeBreakout() {
     breakout.brickHeight = (breakout.canvas.height * 0.6) / (breakout.grid.length + 2);
 
     //Render the game (resizing a canvas clears it too)
-    breakout.animationFrame = renderBreakout();
+    breakout.animationFrame = requestAnimationFrame(renderBreakout);
 }
 
 function renderBreakout(timestamp) {
-    //Progress one frame
-    updateBreakout(timestamp);
+    let deltaT;
+    if (timestamp == undefined) {
+        deltaT = 0;
+    } else {
+        if (breakout.prevTime == undefined) {
+            breakout.prevTime = timestamp;
+            deltaT = 0;
+        } else {
+            deltaT = timestamp - breakout.prevTime;
+            breakout.prevTime = timestamp;
+        }
+    }
+    deltaT /= 2;
+
+    //Progress two frames because I'm too lazy to make the physics better, so just process in higher time resolution
+    updateBreakout(deltaT / 2);
+    updateBreakout(deltaT / 2);
 
     //Clear the canvas
     clearBreakoutCanvas();
