@@ -25,8 +25,7 @@ function init() {
     secretPuzzles = localStorage.getItem("secretPuzzles");
 
     if (globalTime == null && secretPuzzles == null) {
-        statsContainer.innerHTML =
-            "There don't appear to be any stats to display yet. Try doing the puzzles first.";
+        statsContainer.innerHTML = "There don't appear to be any stats to display yet. Try doing the puzzles first.";
         return;
     }
 
@@ -39,8 +38,7 @@ function init() {
                 statsContainer.innerHTML += "<br>";
 
                 if (times[puzzle] != null) {
-                    statsContainer.innerHTML +=
-                        "Puzzle " + puzzle + ": " + convertSeconds(times[puzzle]);
+                    statsContainer.innerHTML += "Puzzle " + puzzle + ": " + convertSeconds(times[puzzle]);
                 } else {
                     statsContainer.innerHTML += "Puzzle " + puzzle + ": Not completed";
                 }
@@ -53,11 +51,7 @@ function init() {
             statsContainer.innerHTML += "<br><br>";
         }
         let secretPuzzlesCompleted = Object.keys(JSON.parse(secretPuzzles)).length;
-        statsContainer.innerHTML +=
-            "Completed " +
-            secretPuzzlesCompleted +
-            " secret puzzle" +
-            (secretPuzzlesCompleted > 1 ? "s" : "");
+        statsContainer.innerHTML += "Completed " + secretPuzzlesCompleted + " secret puzzle" + (secretPuzzlesCompleted > 1 ? "s" : "");
     }
 
     //Register the event listeners for the konami code

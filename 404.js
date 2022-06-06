@@ -58,8 +58,7 @@ function init() {
         }
     } else {
         //Puzzle already completed
-        container404.innerHTML =
-            "Well. Hmm. I think you might be lost. Try using the buttons at the top right to get where you're going.<br /><br /><br />You've already completed this puzzle. You can't do it again.";
+        container404.innerHTML = "Well. Hmm. I think you might be lost. Try using the buttons at the top right to get where you're going.<br /><br /><br />You've already completed this puzzle. You can't do it again.";
     }
 
     //Register the event listeners for the konami code
@@ -97,8 +96,7 @@ function checkInput() {
         localStorage.setItem("secretPuzzles", JSON.stringify(secretPuzzles));
 
         //Delete the input box and update the message
-        container404.innerHTML =
-            "Well. Hmm. I think you might be lost. Try using the buttons at the top right to get where you're going.<br /><br /><br />You've already completed this puzzle. You can't do it again.";
+        container404.innerHTML = "Well. Hmm. I think you might be lost. Try using the buttons at the top right to get where you're going.<br /><br /><br />You've already completed this puzzle. You can't do it again.";
 
         //Stop the watcher for position
         navigator.geolocation.clearWatch(watcher);
@@ -117,9 +115,7 @@ function checkLocationPuzzle(position) {
     let error = position.coords.accuracy;
 
     //Calculate distance to school in meters
-    let distToSchool =
-        Math.sqrt((schoolPos.latitude - latitude) ** 2 + (schoolPos.longitude - longitude) ** 2) *
-        111000;
+    let distToSchool = Math.sqrt((schoolPos.latitude - latitude) ** 2 + (schoolPos.longitude - longitude) ** 2) * 111000;
 
     if (distToSchool - error > 500) {
         //We aren't near the school - puzzle is complete

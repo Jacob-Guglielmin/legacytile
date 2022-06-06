@@ -111,8 +111,7 @@ function init() {
     }
 
     //Show the console message and comment in the DOM tree
-    let commentText =
-        "Hi! Looks like you're poking around in the console! There will NEVER be any hints or solutions in here, if that's what you're looking for. All of the code for these puzzles is readable on purpose - I've learned a lot about programming by reading and tinkering with other people's code. However, if you're just here to spoil the puzzles, keep in mind that the puzzles themselves are probably more fun than just changing a variable or two!\n\nGood luck!\n\n-Jacob Guglielmin, Class of 2022";
+    let commentText = "Hi! Looks like you're poking around in the console! There will NEVER be any hints or solutions in here, if that's what you're looking for. All of the code for these puzzles is readable on purpose - I've learned a lot about programming by reading and tinkering with other people's code. However, if you're just here to spoil the puzzles, keep in mind that the puzzles themselves are probably more fun than just changing a variable or two!\n\nGood luck!\n\n-Jacob Guglielmin, Class of 2022";
     console.log("%c" + commentText, "font-size: 1.25em; font-weight: bold;");
     document.prepend(document.createComment(commentText));
 
@@ -264,8 +263,7 @@ function displayPuzzle(id) {
 
     switch (id) {
         case "INTRO":
-            mainText.innerHTML =
-                "Hi there! You must've just scanned the QR code on my legacy tile! I made a series of (hopefully fun) puzzles that you can try out. Just a quick warning in advance - these puzzles do get quite difficult (I mean, this is Westmount, after all). Each of the puzzles is very different than each of the others, but many will require you to use some form of external tools of your choosing. If you do decide to try these out, I hope you enjoy them! For those of you who are already thinking about it, just letting you know that viewing the page source will spoil many of the puzzles.";
+            mainText.innerHTML = "Hi there! You must've just scanned the QR code on my legacy tile! I made a series of (hopefully fun) puzzles that you can try out. Just a quick warning in advance - these puzzles do get quite difficult (I mean, this is Westmount, after all). Each of the puzzles is very different than each of the others, but many will require you to use some form of external tools of your choosing. If you do decide to try these out, I hope you enjoy them! For those of you who are already thinking about it, just letting you know that viewing the page source will spoil many of the puzzles.";
             mainButton.innerHTML = "Got it!";
             mainButton.onclick = nextPuzzle;
             showElements(mainButton, mainText);
@@ -282,8 +280,7 @@ function displayPuzzle(id) {
                 return nextPuzzle(true);
             }
 
-            mainText.innerHTML =
-                "Looks like you're using a touchscreen. Makes sense - you probably got here from a QR code.<br>Almost all of these puzzles are not designed to be played on any sort of mobile device, so you should visit this website on your computer if you want to try them.<br>Call it puzzle 0, if you like.<br><br>(If you're just on a laptop with a touchscreen, you can click the button below to ignore this and continue, but keep in mind these won't work on phones and tablets.)";
+            mainText.innerHTML = "Looks like you're using a touchscreen. Makes sense - you probably got here from a QR code.<br>Almost all of these puzzles are not designed to be played on any sort of mobile device, so you should visit this website on your computer if you want to try them.<br>Call it puzzle 0, if you like.<br><br>(If you're just on a laptop with a touchscreen, you can click the button below to ignore this and continue, but keep in mind these won't work on phones and tablets.)";
             mainButton.innerHTML = "Continue (NOT RECOMMENDED)";
             mainButton.onclick = () => {
                 nextPuzzle(true);
@@ -297,8 +294,7 @@ function displayPuzzle(id) {
         case "1":
             //CODE VALIDATION
 
-            mainText.innerHTML =
-                "All of these puzzles are solved by identifying and providing a specific code. These codes are 7 characters long, and contain three numbers, three letters, and a symbol. To make sure you've got all that, I'll make this first puzzle easy. Just put the correct solution in the box, and hit Submit!<br>";
+            mainText.innerHTML = "All of these puzzles are solved by identifying and providing a specific code. These codes are 7 characters long, and contain three numbers, three letters, and a symbol. To make sure you've got all that, I'll make this first puzzle easy. Just put the correct solution in the box, and hit Submit!<br>";
 
             //Create a valid sequence for the answer
             curSolution = genRandomSequence(true);
@@ -313,8 +309,7 @@ function displayPuzzle(id) {
             }
 
             //Set a random cell to the current solution
-            solutionsTable.rows[randomBetween(0, 4)].cells[randomBetween(0, 4)].innerHTML =
-                curSolution.sanitize();
+            solutionsTable.rows[randomBetween(0, 4)].cells[randomBetween(0, 4)].innerHTML = curSolution.sanitize();
 
             mainText.appendChild(solutionsTable);
 
@@ -324,8 +319,7 @@ function displayPuzzle(id) {
         case "2":
             //OFFSCREEN ELEMENT
 
-            mainText.innerHTML =
-                "Ok, that last one was pretty easy. You're going to have to think outside the box a little bit on this one.";
+            mainText.innerHTML = "Ok, that last one was pretty easy. You're going to have to think outside the box a little bit on this one.";
 
             //Create an element to hold the code, and put it slightly offscreen
             let offscreenElement = document.createElement("div");
@@ -351,10 +345,7 @@ function displayPuzzle(id) {
 
             //This is kinda complicated. We create a new valid sequence, but we use a seeded random number generator to make sure it stays the same.
             //We seed with the current date, so it resets every day, and we also use the random number assigned to this user to ensure it isn't the same for everyone playing that day.
-            curSolution = genRandomSequence(
-                true,
-                new Date().toLocaleString().split(",")[0] + device
-            );
+            curSolution = genRandomSequence(true, new Date().toLocaleString().split(",")[0] + device);
 
             //Create the element to display the characters
             timePuzzle.charElement = document.createElement("div");
@@ -396,19 +387,10 @@ function displayPuzzle(id) {
                 "a#": 466.16
             };
             let notesSelected = [];
-            notesSelected.push(
-                Object.keys(sharps)[randomBetween(0, Object.keys(sharps).length - 1)] +
-                    randomBetween(4, 5)
-            );
-            notesSelected.push(
-                Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] +
-                    randomBetween(4, 5)
-            );
+            notesSelected.push(Object.keys(sharps)[randomBetween(0, Object.keys(sharps).length - 1)] + randomBetween(4, 5));
+            notesSelected.push(Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] + randomBetween(4, 5));
             while (notesSelected.length < 3 || notesSelected[1] == notesSelected[2]) {
-                notesSelected.push(
-                    Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] +
-                        randomBetween(4, 5)
-                );
+                notesSelected.push(Object.keys(notes)[randomBetween(0, Object.keys(notes).length - 1)] + randomBetween(4, 5));
             }
             shuffleArray(notesSelected);
 
@@ -437,11 +419,7 @@ function displayPuzzle(id) {
             let playSoundButton = document.createElement("button");
             playSoundButton.innerHTML = "Play";
             playSoundButton.onclick = () => {
-                playTones(
-                    { pitch: notesSelected[0], volume: 0.5, time: 1 },
-                    { pitch: notesSelected[1], volume: 0.5, time: 1 },
-                    { pitch: notesSelected[2], volume: 0.5, time: 1 }
-                );
+                playTones({ pitch: notesSelected[0], volume: 0.5, time: 1 }, { pitch: notesSelected[1], volume: 0.5, time: 1 }, { pitch: notesSelected[2], volume: 0.5, time: 1 });
             };
 
             document.body.appendChild(playSoundButton);
@@ -465,8 +443,7 @@ function displayPuzzle(id) {
 
             //Position the element randomly in the bottom 80% of the screen
             mainContainer.style.left = randomBetween(100, window.innerWidth - 100) + "px";
-            mainContainer.style.top =
-                randomBetween(0.2 * window.innerHeight, window.innerHeight - 100) + "px";
+            mainContainer.style.top = randomBetween(0.2 * window.innerHeight, window.innerHeight - 100) + "px";
 
             //Add the container to the page
             document.body.appendChild(mainContainer);
@@ -485,9 +462,7 @@ function displayPuzzle(id) {
             curSolution = "b@23cn8";
 
             //Create the audio element we will be using
-            let audioElement = new Audio(
-                "https://github.com/Jacob-Guglielmin/legacy-tile-assets/blob/master/puzzle.mp3?raw=true"
-            );
+            let audioElement = new Audio("https://github.com/Jacob-Guglielmin/legacy-tile-assets/blob/master/puzzle.mp3?raw=true");
 
             //Create the container for the play and download buttons
             let buttonContainer = document.createElement("div");
@@ -505,8 +480,7 @@ function displayPuzzle(id) {
             downloadButton.innerHTML = "Download Audio";
             downloadButton.onclick = () => {
                 let audioLink = document.createElement("a");
-                audioLink.href =
-                    "https://github.com/Jacob-Guglielmin/legacy-tile-assets/blob/master/puzzle.mp3?raw=true";
+                audioLink.href = "https://github.com/Jacob-Guglielmin/legacy-tile-assets/blob/master/puzzle.mp3?raw=true";
                 audioLink.download = "puzzle.mp3";
                 audioLink.click();
             };
@@ -558,8 +532,7 @@ function displayPuzzle(id) {
             break;
 
         default:
-            mainText.innerHTML =
-                "Well, whatever you've just tried to do, it didn't work. It could be something on my end (sorry!). Try reloading the page.";
+            mainText.innerHTML = "Well, whatever you've just tried to do, it didn't work. It could be something on my end (sorry!). Try reloading the page.";
             hideElements(mainButton, mainInput);
             break;
     }
@@ -607,7 +580,7 @@ function setupBreakout() {
 
     //Initialize the grid to full of breakable bricks
     breakout.grid = [];
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 11; i++) {
         breakout.grid[i] = [];
         for (let j = 0; j < 33; j++) {
             breakout.grid[i][j] = 1;
@@ -617,7 +590,7 @@ function setupBreakout() {
     //Make the bricks representing the code unbreakable
     for (let char = 0; char < curSolution.length; char++) {
         let leftSide = char * 5;
-        let topSide = (13 - 5) / 2;
+        let topSide = (11 - 5) / 2;
 
         let positions = breakout.chars[curSolution[char]];
 
@@ -673,11 +646,7 @@ function cleanUpBreakout() {
 function updateBreakout(deltaT) {
     //Move paddle
     if (mousePos.x != undefined) {
-        breakout.paddle.x = clamp(
-            mousePos.x - breakout.paddle.width / 2,
-            0,
-            window.innerWidth - breakout.paddle.width
-        );
+        breakout.paddle.x = clamp(mousePos.x - breakout.paddle.width / 2, 0, window.innerWidth - breakout.paddle.width);
     }
 
     //Save previous position of ball
@@ -711,17 +680,10 @@ function updateBreakout(deltaT) {
     }
 
     //Check if the ball has hit the paddle
-    if (
-        breakout.ball.x > breakout.paddle.x - breakout.ballSize &&
-        breakout.ball.x < breakout.paddle.x + breakout.paddle.width + breakout.ballSize &&
-        breakout.ball.y > breakout.paddle.y - breakout.ballSize &&
-        prevBallPos.y < breakout.paddle.y - breakout.ballSize
-    ) {
+    if (breakout.ball.x > breakout.paddle.x - breakout.ballSize && breakout.ball.x < breakout.paddle.x + breakout.paddle.width + breakout.ballSize && breakout.ball.y > breakout.paddle.y - breakout.ballSize && prevBallPos.y < breakout.paddle.y - breakout.ballSize) {
         //Calculate direction of ball - edge should aim ball Math.PI / 4 away from the center, center should aim up
 
-        let hitPos =
-            (breakout.ball.x - breakout.paddle.x - breakout.paddle.width / 2) /
-            (breakout.paddle.width / 2);
+        let hitPos = (breakout.ball.x - breakout.paddle.x - breakout.paddle.width / 2) / (breakout.paddle.width / 2);
 
         if (Math.abs(hitPos) < 0.2) {
             breakout.ball.direction = -breakout.ball.direction;
@@ -733,17 +695,10 @@ function updateBreakout(deltaT) {
     }
 
     //Check if the ball has hit a brick
-    for (let i = 0; i < breakout.grid.length; i++) {
+    outer: for (let i = 0; i < breakout.grid.length; i++) {
         for (let j = 0; j < breakout.grid[i].length; j++) {
             if (breakout.grid[i][j] != 0) {
-                if (
-                    checkCollision(
-                        breakout.ball.x,
-                        breakout.ball.y,
-                        (j + 1) * breakout.brickWidth,
-                        (i + 2) * breakout.brickHeight
-                    )
-                ) {
+                if (checkCollision(breakout.ball.x, breakout.ball.y, (j + 1) * breakout.brickWidth, (i + 2) * breakout.brickHeight)) {
                     //The ball has hit this brick
 
                     //Figure out if it hit the side or the top
@@ -769,44 +724,59 @@ function updateBreakout(deltaT) {
                     }
 
                     //Check if the path of the ball intersects this line
-                    if (
-                        checkLines(
-                            line.x1,
-                            line.y1,
-                            line.x2,
-                            line.y2,
-                            prevBallPos.x,
-                            prevBallPos.y,
-                            breakout.ball.x + Math.cos(breakout.ball.direction) * 1000,
-                            breakout.ball.y + Math.sin(breakout.ball.direction) * 1000
-                        )
-                    ) {
+                    if (checkLines(line.x1, line.y1, line.x2, line.y2, prevBallPos.x, prevBallPos.y, breakout.ball.x + Math.cos(breakout.ball.direction) * 1000, breakout.ball.y + Math.sin(breakout.ball.direction) * 1000)) {
                         //The ball hit the top or bottom of the brick
+                        //Check if we actually hit it by checking vertically for unbroken blocks
+                        if (prevBallPos.y > (i + 2.5) * breakout.brickHeight) {
+                            //Check if the block below isn't broken
+                            if (i + 1 < breakout.grid.length && breakout.grid[i + 1][j] != 0) {
+                                //The block below is unbroken
+                                continue;
+                            }
+                        } else {
+                            //Check if the block above isn't broken
+                            if (i - 1 >= 0 && breakout.grid[i - 1][j] != 0) {
+                                //The block above is unbroken
+                                continue;
+                            }
+                        }
+
                         breakout.ball.direction = -breakout.ball.direction;
 
                         //Snap to the side that was hit
                         if (prevBallPos.y > (i + 2.5) * breakout.brickHeight) {
                             //Bottom
-                            breakout.ball.y =
-                                (i + 3) * breakout.brickHeight * 1.001 + breakout.ballSize;
+                            breakout.ball.y = (i + 3) * breakout.brickHeight * 1.001 + breakout.ballSize;
                         } else {
                             //Top
-                            breakout.ball.y =
-                                (i + 2) * breakout.brickHeight * 0.999 - breakout.ballSize;
+                            breakout.ball.y = (i + 2) * breakout.brickHeight * 0.999 - breakout.ballSize;
                         }
                     } else {
                         //The ball hit the side of the brick
+                        //Check if we actually hit it by checking horizontally for unbroken blocks
+                        if (prevBallPos.x > (j + 1.5) * breakout.brickWidth) {
+                            //Check if the block to the right isn't broken
+                            if (j + 1 < breakout.grid[i].length && breakout.grid[i][j + 1] != 0) {
+                                //The block to the right is unbroken
+                                continue;
+                            }
+                        } else {
+                            //Check if the block to the left isn't broken
+                            if (j - 1 >= 0 && breakout.grid[i][j - 1] != 0) {
+                                //The block to the left is unbroken
+                                continue;
+                            }
+                        }
+
                         breakout.ball.direction = Math.PI - breakout.ball.direction;
 
                         //Snap to the side that was hit
                         if (prevBallPos.x > (j + 1.5) * breakout.brickWidth) {
                             //Right
-                            breakout.ball.x =
-                                (j + 2) * breakout.brickWidth * 1.001 + breakout.ballSize;
+                            breakout.ball.x = (j + 2) * breakout.brickWidth * 1.001 + breakout.ballSize;
                         } else {
                             //Left
-                            breakout.ball.x =
-                                (j + 1) * breakout.brickWidth * 0.999 - breakout.ballSize;
+                            breakout.ball.x = (j + 1) * breakout.brickWidth * 0.999 - breakout.ballSize;
                         }
                     }
 
@@ -817,7 +787,9 @@ function updateBreakout(deltaT) {
                         //Color the brick
                         breakout.grid[i][j] = 3;
                     }
-                    break;
+
+                    //We can't break more than one brick during a single game tick, so exit the loop
+                    break outer;
                 }
             }
         }
@@ -834,13 +806,9 @@ function checkCollision(ballx, bally, brickx, bricky) {
 }
 
 function checkLines(x1, y1, x2, y2, x3, y3, x4, y4) {
-    let uA =
-        ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) /
-        ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+    let uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 
-    let uB =
-        ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) /
-        ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+    let uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 
     if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
         return true;
@@ -916,29 +884,14 @@ function renderBreakout(timestamp) {
 function drawBrick(x, y, type) {
     breakout.renderer.fillStyle = type != 3 ? "#6bd603" : "#d63803";
     breakout.renderer.strokeStyle = "#2a2d31";
-    breakout.renderer.fillRect(
-        (x + 1) * breakout.brickWidth,
-        (y + 2) * breakout.brickHeight,
-        breakout.brickWidth,
-        breakout.brickHeight
-    );
-    breakout.renderer.strokeRect(
-        (x + 1) * breakout.brickWidth,
-        (y + 2) * breakout.brickHeight,
-        breakout.brickWidth,
-        breakout.brickHeight
-    );
+    breakout.renderer.fillRect((x + 1) * breakout.brickWidth, (y + 2) * breakout.brickHeight, breakout.brickWidth, breakout.brickHeight);
+    breakout.renderer.strokeRect((x + 1) * breakout.brickWidth, (y + 2) * breakout.brickHeight, breakout.brickWidth, breakout.brickHeight);
 }
 
 function drawPaddle() {
     breakout.renderer.fillStyle = "#d3d7cd";
 
-    breakout.renderer.fillRect(
-        breakout.paddle.x,
-        breakout.paddle.y,
-        breakout.paddle.width,
-        breakout.paddle.height
-    );
+    breakout.renderer.fillRect(breakout.paddle.x, breakout.paddle.y, breakout.paddle.width, breakout.paddle.height);
 }
 
 function drawBall() {
@@ -1031,10 +984,7 @@ function genRandomSequence(isValid, seed, useBreakoutChars) {
         symbolCount = 1;
     } else {
         // this is really lazy, but it works, ok? we also dont use this a lot, so i don't care
-        while (
-            numberCount + letterCount + symbolCount != 7 ||
-            (numberCount == 3 && letterCount == 3 && symbolCount == 1)
-        ) {
+        while (numberCount + letterCount + symbolCount != 7 || (numberCount == 3 && letterCount == 3 && symbolCount == 1)) {
             numberCount = randomBetween(0, 4);
             letterCount = randomBetween(0, 4);
             symbolCount = randomBetween(0, 4);
@@ -1128,20 +1078,15 @@ function playTones(...tones) {
         let i;
         //Create a wave with the given pitch and volume for the given time
         for (i = 0; i < audio.context.sampleRate * tone.time; i++) {
-            soundArr.push(
-                Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume
-            );
+            soundArr.push(Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume);
         }
 
         //The rest here is to prevent weird audio artifacts created by each tone dropping to zero and then back to volume
         //Keep generating the wave until the value reaches about 0
-        let prev =
-            Math.sin((i - 1) / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) *
-            tone.volume;
+        let prev = Math.sin((i - 1) / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume;
         while (true) {
             //Get the next value
-            let next =
-                Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume;
+            let next = Math.sin(i / (audio.context.sampleRate / tone.pitch / (Math.PI * 2))) * tone.volume;
 
             //Check if the new value has just crossed into the positive range
             if (prev <= 0 && next >= 0) {
@@ -1219,13 +1164,7 @@ window.addEventListener("blur", () => {
     }
 });
 window.addEventListener("focus", () => {
-    if (
-        puzzle != undefined &&
-        puzzle != "INTRO" &&
-        puzzle != "0" &&
-        puzzle != "???" &&
-        timeTrackingInterval == null
-    ) {
+    if (puzzle != undefined && puzzle != "INTRO" && puzzle != "0" && puzzle != "???" && timeTrackingInterval == null) {
         timeTrackingInterval = setInterval(trackTime, 1000);
     }
 });
@@ -1245,26 +1184,8 @@ function renderTickers() {
     let globalMinutes = Math.floor((globalTimeElapsed % 3600) / 60);
     let globalSeconds = globalTimeElapsed % 60;
 
-    puzzleTicker.innerHTML =
-        "Time elapsed (this puzzle): " +
-        (puzzleHours < 10 ? "0" : "") +
-        puzzleHours +
-        ":" +
-        (puzzleMinutes < 10 ? "0" : "") +
-        puzzleMinutes +
-        ":" +
-        (puzzleSeconds < 10 ? "0" : "") +
-        puzzleSeconds;
-    globalTicker.innerHTML =
-        "Time elapsed (all puzzles): " +
-        (globalHours < 10 ? "0" : "") +
-        globalHours +
-        ":" +
-        (globalMinutes < 10 ? "0" : "") +
-        globalMinutes +
-        ":" +
-        (globalSeconds < 10 ? "0" : "") +
-        globalSeconds;
+    puzzleTicker.innerHTML = "Time elapsed (this puzzle): " + (puzzleHours < 10 ? "0" : "") + puzzleHours + ":" + (puzzleMinutes < 10 ? "0" : "") + puzzleMinutes + ":" + (puzzleSeconds < 10 ? "0" : "") + puzzleSeconds;
+    globalTicker.innerHTML = "Time elapsed (all puzzles): " + (globalHours < 10 ? "0" : "") + globalHours + ":" + (globalMinutes < 10 ? "0" : "") + globalMinutes + ":" + (globalSeconds < 10 ? "0" : "") + globalSeconds;
 }
 
 String.prototype.sanitize = function () {
