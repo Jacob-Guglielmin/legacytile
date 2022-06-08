@@ -14,7 +14,9 @@
 
 "use strict";
 
+//DEVELOPMENT ONLY - overrides the current puzzle to the puzzle specified
 const overridePuzzle = null;
+//DEVELOPMENT ONLY - assigns this device a new device ID if true, even if it already has one
 const newDevice = false;
 
 //Puzzle on
@@ -191,6 +193,9 @@ function nextPuzzle(cameFromTouchCheck) {
         return displayPuzzle(puzzle);
     }
 
+    //Delete the entry for the code puzzle solution, if it exists
+    localStorage.removeItem("codePuzzleSolution");
+
     if (puzzle == "INTRO") {
         //Set the puzzle to the first puzzle
         puzzle = "0";
@@ -222,7 +227,7 @@ function nextPuzzle(cameFromTouchCheck) {
 }
 
 function checkInput() {
-    if (curSolution == mainInput.value) {
+    if (curSolution == mainInput.value.toLowerCase()) {
         if (!konami.active) {
             //Display the next puzzle
             nextPuzzle();
@@ -345,7 +350,7 @@ function displayPuzzle(id) {
 
             //This is kinda complicated. We create a new valid sequence, but we use a seeded random number generator to make sure it stays the same.
             //We seed with the current date, so it resets every day, and we also use the random number assigned to this user to ensure it isn't the same for everyone playing that day.
-            curSolution = genRandomSequence(true, new Date().toLocaleString().split(",")[0] + device);
+            curSolution = genRandomSequence(true, new Math.seedRandom(new Date().toLocaleString().split(",")[0] + device));
 
             //Create the element to display the characters
             timePuzzle.charElement = document.createElement("div");
@@ -430,6 +435,25 @@ function displayPuzzle(id) {
             break;
 
         case "5":
+            //CODE VALIDATION++
+
+            mainText.innerHTML = "This one seems a little familiar - the button provided will download a text file containing the correct solution, but it also contains 9999 incorrect solutions. However, the correct solution has no duplicated numbers, no consecutive letters or numbers (increasing or decreasing), and the sum of each character's ASCII code is evenly divisible by the ASCII code of the symbol.";
+
+            //Set to NaN for now if we haven't generated a code yet, because NaN != literally everything, so nothing entered will be correct, which is fine because there is no way of knowing the answer yet
+            curSolution = localStorage.getItem("codePuzzleSolution") || NaN;
+
+            let downloadPuzzleButton = document.createElement("button");
+            downloadPuzzleButton.innerHTML = "Download Solutions";
+            downloadPuzzleButton.onclick = downloadCodePuzzle;
+
+            document.body.appendChild(downloadPuzzleButton);
+
+            removeOnNextPuzzle = downloadPuzzleButton;
+
+            doAlways();
+            break;
+
+        case "6":
             //CONTRAST
 
             mainText.innerHTML = "Contrast puzzle";
@@ -453,7 +477,7 @@ function displayPuzzle(id) {
             doAlways();
             break;
 
-        case "6":
+        case "7":
             //SPECTROGRAM
 
             mainText.innerHTML = "Audio puzzle 2";
@@ -912,7 +936,7 @@ function updateTimePuzzle() {
     let curDate = dateObj.toISOString().split("T")[0];
     if (curDate != timePuzzle.lastDate && timePuzzle.lastDate != undefined) {
         //Reset the solution
-        curSolution = genRandomSequence(true, new Date().toLocaleString().split(",")[0] + device);
+        curSolution = genRandomSequence(true, new Math.seedRandom(new Date().toLocaleString().split(",")[0] + device));
 
         timePuzzle.lastDate = curDate;
     } else if (timePuzzle.lastDate == undefined) {
@@ -971,12 +995,129 @@ function updateTimePuzzle() {
     }
 }
 
-function genRandomSequence(isValid, seed, useBreakoutChars) {
-    let seededRandom;
-    if (seed != undefined) {
-        seededRandom = new Math.seedrandom(seed);
+function downloadCodePuzzle() {
+    let seeded = new Math.seedrandom(device + "validation");
+
+    let codes = [];
+    for (let i = 0; i < 10000; i++) {
+        let sequence;
+        if (randomBetween(0, 6, seeded) == 0) {
+            sequence = genRandomSequence(false, seeded);
+        } else {
+            outer: while (true) {
+                sequence = genRandomSequence(true, seeded);
+
+                for (let i = 0; i < sequence.length - 1; i++) {
+                    //Check if the next character is a consecutive letter or number
+                    let compare = [sequence[i], sequence[i + 1]];
+                    if (compare.every((char) => !isNaN(parseInt(char)))) {
+                        compare.map((x) => parseInt(x));
+                        if (compare[0] + 1 == compare[1] || compare[0] - 1 == compare[1]) {
+                            break outer;
+                        }
+                    } else if (compare.every((char) => /[[:a-z:]]/.test(char))) {
+                        if (compare[0].charCodeAt(0) + 1 == compare[1].charCodeAt(0) || compare[0].charCodeAt(0) - 1 == compare[1].charCodeAt(0)) {
+                            break outer;
+                        }
+                    }
+                }
+
+                let sumAscii = 0;
+                for (let char of sequence) {
+                    sumAscii += char.charCodeAt(0);
+                }
+                for (let char of sequence) {
+                    if (!/[a-z0-9]/.test(char)) {
+                        let temp = char.charCodeAt(0).toString();
+                        if (sumAscii % parseInt(temp) != 0) {
+                            break outer;
+                        }
+                    }
+                }
+
+                let used = [];
+                for (let char of sequence) {
+                    if (!isNaN(parseInt(char))) {
+                        if (used.includes(parseInt(char))) {
+                            break outer;
+                        }
+                        used.push(parseInt(char));
+                    }
+                }
+            }
+        }
+        codes.push(sequence);
     }
 
+    let sequence;
+    outer: while (true) {
+        sequence = genRandomSequence(true, seeded);
+
+        for (let i = 0; i < sequence.length - 1; i++) {
+            //Check if the next character is a consecutive letter or number
+            let compare = [sequence[i], sequence[i + 1]];
+            if (compare.every((char) => !isNaN(parseInt(char)))) {
+                compare.map((x) => parseInt(x));
+                if (compare[0] + 1 == compare[1] || compare[0] - 1 == compare[1]) {
+                    continue outer;
+                }
+            } else if (compare.every((char) => /[[:a-z:]]/.test(char))) {
+                if (compare[0].charCodeAt(0) + 1 == compare[1].charCodeAt(0) || compare[0].charCodeAt(0) - 1 == compare[1].charCodeAt(0)) {
+                    continue outer;
+                }
+            }
+        }
+
+        let sumAscii = 0;
+        for (let char of sequence) {
+            sumAscii += char.charCodeAt(0);
+        }
+        for (let char of sequence) {
+            if (!/[a-z0-9]/.test(char)) {
+                let temp = char.charCodeAt(0).toString();
+                if (sumAscii % parseInt(temp) != 0) {
+                    continue outer;
+                }
+            }
+        }
+
+        let used = [];
+        for (let char of sequence) {
+            if (!isNaN(parseInt(char))) {
+                if (used.includes(parseInt(char))) {
+                    continue outer;
+                }
+                used.push(parseInt(char));
+            }
+        }
+        break;
+    }
+    codes[randomBetween(0, 9999, seeded)] = sequence;
+    curSolution = sequence;
+    localStorage.setItem("codePuzzleSolution", sequence);
+
+    codes = codes.join("\n");
+
+    // Create an invisible A element
+    const a = document.createElement("a");
+    a.style.display = "none";
+    document.body.appendChild(a);
+
+    // Set the HREF to a Blob representation of the data to be downloaded
+    a.href = window.URL.createObjectURL(new Blob([codes], { type: "text/plain" }));
+
+    // Use download attribute to set set desired file name
+    a.setAttribute("download", "puzzle.txt");
+
+    // Trigger the download by simulating click
+    a.click();
+
+    // Cleanup
+    window.URL.revokeObjectURL(a.href);
+    document.body.removeChild(a);
+}
+
+function genRandomSequence(isValid, seededFunction, useBreakoutChars) {
     let numberCount, letterCount, symbolCount;
     if (isValid) {
         numberCount = 3;
@@ -985,31 +1126,31 @@ function genRandomSequence(isValid, seed, useBreakoutChars) {
     } else {
         // this is really lazy, but it works, ok? we also dont use this a lot, so i don't care
         while (numberCount + letterCount + symbolCount != 7 || (numberCount == 3 && letterCount == 3 && symbolCount == 1)) {
-            numberCount = randomBetween(0, 4);
-            letterCount = randomBetween(0, 4);
-            symbolCount = randomBetween(0, 4);
+            numberCount = randomBetween(0, 4, seededFunction);
+            letterCount = randomBetween(0, 4, seededFunction);
+            symbolCount = randomBetween(0, 4, seededFunction);
         }
     }
     let sequence = "";
     for (let i = 0; i < numberCount; i++) {
         if (!useBreakoutChars) {
-            sequence += randomBetween(0, 9, seededRandom);
+            sequence += randomBetween(0, 9, seededFunction);
         } else {
-            sequence += "234679"[randomBetween(0, 5, seededRandom)];
+            sequence += "234679"[randomBetween(0, 5, seededFunction)];
         }
     }
     for (let i = 0; i < letterCount; i++) {
         if (!useBreakoutChars) {
-            sequence += "abcdefghijklmnopqrstuvwxyz"[randomBetween(0, 25, seededRandom)];
+            sequence += "abcdefghijklmnopqrstuvwxyz"[randomBetween(0, 25, seededFunction)];
         } else {
-            sequence += "acefhjlptu"[randomBetween(0, 9, seededRandom)];
+            sequence += "acefhjlptu"[randomBetween(0, 9, seededFunction)];
         }
     }
     for (let i = 0; i < symbolCount; i++) {
         if (!useBreakoutChars) {
-            sequence += "!@#$%^&*(+-=[};:/>?~"[randomBetween(0, 19, seededRandom)];
+            sequence += "!'#$%&(+-/:<=?@_]~"[randomBetween(0, 17, seededFunction)];
         } else {
-            sequence += ".:-!]"[randomBetween(0, 4, seededRandom)];
+            sequence += ".:-!]"[randomBetween(0, 4, seededFunction)];
         }
     }
 
@@ -1019,10 +1160,10 @@ function genRandomSequence(isValid, seed, useBreakoutChars) {
 
     for (let i = n - 1; i > 0; i--) {
         let j;
-        if (seed == undefined) {
+        if (seededFunction == undefined) {
             j = Math.floor(Math.random() * (i + 1));
         } else {
-            j = Math.floor(seededRandom() * (i + 1));
+            j = Math.floor(seededFunction() * (i + 1));
         }
 
         let tmp = a[i];
@@ -1031,10 +1172,6 @@ function genRandomSequence(isValid, seed, useBreakoutChars) {
     }
 
     sequence = a.join("");
-
-    if (sequence.length != 7) {
-        console.error("Huh? " + sequence.length + "**" + sequence + "**");
-    }
     return sequence;
 }
 
