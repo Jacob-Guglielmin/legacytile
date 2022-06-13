@@ -350,7 +350,7 @@ function displayPuzzle(id) {
 
             //This is kinda complicated. We create a new valid sequence, but we use a seeded random number generator to make sure it stays the same.
             //We seed with the current date, so it resets every day, and we also use the random number assigned to this user to ensure it isn't the same for everyone playing that day.
-            curSolution = genRandomSequence(true, new Math.seedRandom(new Date().toLocaleString().split(",")[0] + device));
+            curSolution = genRandomSequence(true, new Math.seedrandom(new Date().toLocaleString().split(",")[0] + device));
 
             //Create the element to display the characters
             timePuzzle.charElement = document.createElement("div");
@@ -936,7 +936,7 @@ function updateTimePuzzle() {
     let curDate = dateObj.toISOString().split("T")[0];
     if (curDate != timePuzzle.lastDate && timePuzzle.lastDate != undefined) {
         //Reset the solution
-        curSolution = genRandomSequence(true, new Math.seedRandom(new Date().toLocaleString().split(",")[0] + device));
+        curSolution = genRandomSequence(true, new Math.seedrandom(new Date().toLocaleString().split(",")[0] + device));
 
         timePuzzle.lastDate = curDate;
     } else if (timePuzzle.lastDate == undefined) {
