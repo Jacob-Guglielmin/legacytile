@@ -159,7 +159,7 @@ input::selection {
 .contrastPuzzle {
     position: absolute;
     user-select: none;
-    opacity: 0.001;
+    opacity: 0.01;
 }
 
 .breakoutInputs {
