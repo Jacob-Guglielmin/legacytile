@@ -1322,7 +1322,7 @@ window.addEventListener("blur", () => {
     }
 });
 window.addEventListener("focus", () => {
-    if (puzzle != undefined && puzzle != "INTRO" && puzzle != "0" && puzzle != "???" && timeTrackingInterval == null) {
+    if (puzzle != undefined && puzzle != "INTRO" && puzzle != "0" && puzzle != "???" && puzzle != "8" && timeTrackingInterval == null) {
         timeTrackingInterval = setInterval(trackTime, 1000);
     }
 });
