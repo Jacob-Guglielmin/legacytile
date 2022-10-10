@@ -14,9 +14,9 @@
 
 "use strict";
 
-//DEVELOPMENT ONLY - overrides the current puzzle to the puzzle specified
+//DEVELOPMENT ONLY - overrides the current puzzle to the puzzle specified unless null
 const overridePuzzle = null;
-//DEVELOPMENT ONLY - assigns this device a new device ID if true, even if it already has one
+//DEVELOPMENT ONLY - assigns this device a new device ID if true, even if it already has one, unless false
 const newDevice = false;
 
 //Puzzle on
@@ -372,7 +372,7 @@ function displayPuzzle(id) {
         case "4":
             //AUDIO
 
-            mainText.innerHTML = "There isn't much of anything going on here. You're going to have to make note of precisely what you hear to solve this one.<br><br>Note: The solution to this puzzle will change if the page gets refreshed or an incorrect answer is provided.";
+            mainText.innerHTML = "There isn't much of anything going on here. You're going to have to make note of precisely what you hear to solve this one.<br><br>Note: The solution to this puzzle will change if the page gets refreshed.";
 
             //Select three different notes to play, including exactly one sharp, and calculate their frequencies
             const notes = {
@@ -1327,7 +1327,7 @@ window.addEventListener("focus", () => {
     }
 });
 function trackTime() {
-    if (!konami.active) {
+    if (!konami.active && puzzle != "8") {
         puzzleTimeElapsed++;
         globalTimeElapsed++;
 
