@@ -299,7 +299,7 @@ function displayPuzzle(id) {
         case "1":
             //CODE VALIDATION
 
-            mainText.innerHTML = "All of these puzzles are solved by identifying and providing a specific code. These codes are 7 characters long, and contain three numbers, three letters, and a symbol. To make sure you've got all that, I'll make this first puzzle easy. Just put the correct solution in the box, and hit Submit!<br>";
+            mainText.innerHTML = "All of these puzzles are solved by identifying and providing a specific code. These codes are 7 characters long, and contain three numbers, three letters, and a symbol. To make sure you've got all that, I'll make this first puzzle easy. Just put the correct solution in the box, and hit Submit!<br><br>Note: The solution to this puzzle will change if the page gets refreshed or an incorrect answer is provided.<br>";
 
             //Create a valid sequence for the answer
             curSolution = genRandomSequence(true);
@@ -372,7 +372,7 @@ function displayPuzzle(id) {
         case "4":
             //AUDIO
 
-            mainText.innerHTML = "Audio puzzle 1";
+            mainText.innerHTML = "There isn't much of anything going on here. You're going to have to make note of precisely what you hear to solve this one.<br><br>Note: The solution to this puzzle will change if the page gets refreshed or an incorrect answer is provided.";
 
             //Select three different notes to play, including exactly one sharp, and calculate their frequencies
             const notes = {
@@ -456,7 +456,7 @@ function displayPuzzle(id) {
         case "6":
             //CONTRAST
 
-            mainText.innerHTML = "Contrast puzzle";
+            mainText.innerHTML = "Yep, this is it. Maybe try looking a little harder?";
 
             curSolution = genRandomSequence(true);
 
@@ -480,7 +480,7 @@ function displayPuzzle(id) {
         case "7":
             //SPECTROGRAM
 
-            mainText.innerHTML = "Audio puzzle 2";
+            mainText.innerHTML = "This one is HARD (if the earlier ones haven't been already). The solution is contained in the audio below - you can also download the file (and I suggest you do). No matter how hard you listen, you won't be able to find the code - try looking in a different way and it might become less puzzling.";
 
             //I can't really make this randomized - making this puzzle was SO MUCH WORK
             curSolution = "b@23cn8";
@@ -517,6 +517,17 @@ function displayPuzzle(id) {
             removeOnNextPuzzle = buttonContainer;
 
             doAlways();
+            break;
+
+        case "8":
+            //WIN
+
+            mainText.innerHTML = "Congrats! You've completed all the puzzles - impressive! (or have you?...) Maybe there'll be more in the future...";
+
+            //Show only the main text
+            showElements(mainText);
+            hideElements(mainInput, mainButton);
+
             break;
 
         case "???":
