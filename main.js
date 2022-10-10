@@ -524,6 +524,16 @@ function displayPuzzle(id) {
 
             mainText.innerHTML = "Congrats! You've completed all the puzzles - impressive! (or have you?...) Maybe there'll be more in the future...";
 
+            //Replace the number with !!!
+            puzzleOnElement.innerHTML = "!!!";
+
+            //Prevent time tracking
+            if (timeTrackingInterval != null) {
+                clearInterval(timeTrackingInterval);
+                timeTrackingInterval = null;
+            }
+            hideElements(puzzleTicker, globalTicker);
+
             //Show only the main text
             showElements(mainText);
             hideElements(mainInput, mainButton);
@@ -1325,6 +1335,9 @@ function trackTime() {
     }
 }
 function renderTickers() {
+    //Ensure the tickers are visible
+    showElements(puzzleTicker, globalTicker);
+
     let puzzleHours = Math.floor(puzzleTimeElapsed / 3600);
     let puzzleMinutes = Math.floor((puzzleTimeElapsed % 3600) / 60);
     let puzzleSeconds = puzzleTimeElapsed % 60;
